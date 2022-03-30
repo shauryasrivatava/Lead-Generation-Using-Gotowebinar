@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+	
+	
+	
+	
+	<flow name="postFlow" doc:id="5d6b08ad-d8a7-441c-b7ba-3d84f32e5ee0" >
+		<ee:transform doc:name="converting-data-to- JAVA" doc:id="5d08b799-af45-4ff9-9791-43707e36822f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[{
+ 	Name: payload.firstName ++ " " ++ payload.lastName,
+	First_Name__c: payload.firstName,
+	Last_Name__c: payload.lastName,
+	Email__c: payload.email,
+	Phone_Number__c: payload.phone,
+	City__c: payload.city,
+	Country__c: payload.country,
+	Webinar_Details__c: "Attending"
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Log: data-in-java" doc:id="f7e42f5f-3032-4ed0-a85c-e70ae4e00d7d" message="Data converted to JAVA"/>
+		<flow-ref doc:name="validation-flow" doc:id="2275fd71-e2ac-4ef9-bdae-a0f61d16dbf4" name="validationflow"/>
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="991867f1-a3ff-4136-aa43-47581467c056" >
+			<salesforce:create doc:name="inserting-data-in-the-saleforce" doc:id="5f42f4e5-378c-4d14-90d0-60ee7c191e35" config-ref="Salesforce_Config1" type="GTW_Lead__c"/>
+		</until-successful>
+		<logger level="INFO" doc:name="Log: data-inserted-in-salesforce" doc:id="1a5fa0cb-4e4d-41d3-9cb7-d7857fc5e0ca" message="Data Inserted in salesforce"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="3ff57920-049a-4204-8213-bcc2b7b40f7d" type="SALESFORCE:INVALID_INPUT">
+				<email:send doc:name="mailing-when-error" doc:id="3c6c4320-c5d1-4139-bdee-cb2ea9786a64" config-ref="Email_SMTP" fromAddress="mudit.m.srivastava@apisero.com">
+					<email:to-addresses >
+						<email:to-address value="manas.singh0301@gmail.com" />
+					</email:to-addresses>
+					<email:body >
+						<email:content ><![CDATA[Data provided is incorrect.]]></email:content>
+					</email:body>
+				</email:send>
+				<logger level="INFO" doc:name="Log: error-mail-sent" doc:id="a75deb5e-0530-4377-a13a-b91db7988fef" message="Incorrect data,mail sent"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="validationflow" doc:id="f1bdf5b3-815d-4fed-8cc1-51bf69cd2a36" >
+		<validation:is-not-null doc:name="firstname" doc:id="5d70e4b4-af10-449f-9c35-86ee336d64c5" config-ref="Validation_Config1" value="#[payload.First_Name__c]"/>
+		<validation:is-not-null doc:name="lastname" doc:id="a0acdb5d-e5fc-4ab7-a905-594520895059" config-ref="Validation_Config1" value="#[payload.Last_Name__c]"/>
+		<validation:is-not-null doc:name="email" doc:id="68354738-40a4-4701-86bb-d44dc6ad5c4c" config-ref="Validation_Config1" value="#[payload.Email__c]"/>
+		<validation:is-not-null doc:name="phone number" doc:id="3368f9fe-5862-475c-b44c-492ea8ca007d" config-ref="Validation_Config1" value="#[payload.Phone_Number__c]"/>
+		<validation:is-not-null doc:name="city" doc:id="88760b27-7e1e-4eb1-b8cc-c2dd9c853769" config-ref="Validation_Config1" value="#[payload.City__c]"/>
+		<validation:is-not-null doc:name="country" doc:id="27e7cb2d-3418-4424-8d48-b02a56e6198b" config-ref="Validation_Config1" value="#[payload.Country__c]"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="3e556842-89eb-4d3e-a144-996a1cec80fb" >
+				<set-payload value="Invalid data provided" doc:name="error-message" doc:id="e34ade04-6878-42e7-b729-7999da6034a8" />
+				<logger level="INFO" doc:name="Log: error-message" doc:id="44bbdef9-d363-48ca-b77f-0d8b595d7fb6" message="Invalid Data provided"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="68430773-14fe-483c-aeec-6b01edfbec1f" >
+		<email:smtp-connection host="${secure::mailhost}" user="${secure::mailuser}" password="${secure::mailpass}" port="${secure::mailport}"/>
+	</email:smtp-config>
+	<http:listener-config name="HTTP_Listener_config1" doc:name="HTTP Listener config" doc:id="4c6b8619-91b5-41c1-920c-9f5344e6098d" >
+		<http:listener-connection host="0.0.0.0" port="${secure::httpport}" />
+	</http:listener-config>
+	<salesforce:sfdc-config name="Salesforce_Config1" doc:name="Salesforce Config" doc:id="c8b46e66-027f-4517-9524-a7097a80d053" >
+		<salesforce:basic-connection username="${secure::sfuser}" password="${secure::sfpass}" securityToken="${secure::sftoken}" />
+	</salesforce:sfdc-config>
+	<validation:config name="Validation_Config1" doc:name="Validation Config" doc:id="5fba2145-13f7-48fe-98f3-87311eacf2f7" />
+	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="3a67ffe8-29b2-4a89-a3ac-15daffbd8f7b" />
+	<configuration-properties doc:name="Configuration properties" doc:id="163fff46-7a7b-4dc7-955b-2e356fa36306" file="config.properties" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="2b5cc111-84e0-4c7e-9046-a4dee5e704af" file="config.properties" key="secure" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+	
+</mule>

@@ -1,0 +1,43 @@
+#%RAML 1.0
+title: webinar-sys-api
+description: Fetching details of registrants of GoToWebinar using API
+protocols: [HTTP,HTTPS]
+traits:
+  client-id-required:
+    headers:
+      client_id:
+        type: string
+      client_secret:
+        type: string
+    responses:
+      401:
+        description: Unauthorized, The client_id or client_secret are not valid or the client does not have access.
+      429:
+        description: The client used all of its request quota for the current period.
+      500:
+        description: An error occurred, see the specific message (Only if it is a WSDL endpoint).
+      503:
+        description: Contracts Information Unreachable.
+
+types:
+
+  webinar: !include /Datatype/webinar_dataType.raml
+
+
+
+/webinar:
+  get:
+    queryParameters:
+      fromTime:
+        required: True
+      toTime:
+        required: True
+
+    displayName: Get all webinars
+    responses:
+      200:
+        description: "Details have been Fetched"
+        body:
+          application/json:
+            example:
+              

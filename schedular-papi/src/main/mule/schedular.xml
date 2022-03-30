@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:salesforce-data="http://www.mulesoft.org/schema/mule/salesforce-data"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce-data http://www.mulesoft.org/schema/mule/salesforce-data/current/mule-salesforce-data.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="cb9ed6d8-d518-4953-80ac-b865b7764ef1" >
+		<http:request-connection host="${secure::gtwhost}" />
+	</http:request-config>
+	<flow name="addDataToSF" doc:id="232ee336-b26b-4d18-a1e6-b8dbbe58ea71" >
+		<scheduler doc:name="every-midnight" doc:id="de84df16-b9f7-4a73-be49-a62503136f7f" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="500" timeUnit="SECONDS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<flow-ref doc:name="flow--getRegistrants" doc:id="8882ee39-3e1c-4ce5-b461-af4240eb1f0b" name="getRegistrants"/>
+		<logger level="INFO" doc:name="Log: data-added-toSF" doc:id="d5d4c7df-4168-4d0d-9c90-4c4db48ff97d" message="#[payload]" />
+	</flow>
+	<flow name="getRegistrants" doc:id="5aa13473-2571-43f3-b1a3-8a678238a975" >
+		<set-variable value='Bearer eyJraWQiOiJvYXV0aHYyLmxtaS5jb20uMDIxOSIsImFsZyI6IlJTNTEyIn0.eyJzYyI6ImNhbGwtY29udHJvbC52MS5jYWxscy5jb250cm9sIGNhbGxzLnYyLmluaXRpYXRlIG1lc3NhZ2luZy52MS53cml0ZSBpZGVudGl0eTpzY2ltLm9yZyBpZGVudGl0eTpzY2ltLm1lIHJlYWx0aW1lLnYyLm5vdGlmaWNhdGlvbnMubWFuYWdlIG1lc3NhZ2luZy52MS5ub3RpZmljYXRpb25zLm1hbmFnZSBzdXBwb3J0OiBtZXNzYWdpbmcudjEuc2VuZCBpZGVudGl0eTogbWVzc2FnaW5nLnYxLnJlYWQgd2VicnRjLnYxLnJlYWQgd2VicnRjLnYxLndyaXRlIGNvbGxhYjogY3IudjEucmVhZCB1c2Vycy52MS5saW5lcy5yZWFkIiwic3ViIjoiNTM2MjY3NDg3MTY2MDM1NDMzNSIsImF1ZCI6IjNiYjFiMTY3LWU0MTUtNDkwYi1iZGM3LTcyMGNlMGFkZTM2ZCIsIm9nbiI6InB3ZCIsImxzIjoiOTFkY2QzMDgtZDc3NS00YTVlLWEwOGUtNGExNmNmYjcxZTdhIiwidHlwIjoiYSIsImV4cCI6MTY0NjIxNjMxMywiaWF0IjoxNjQ2MjEyNzEzLCJqdGkiOiIyOTE1ZDRjMS00Mjc4LTRkZGYtOWJlYy04ODY3Yzg2NmJhYzIifQ.dvKQB1AhyFGlGhGGNUkSbYps11ObIXw5TSyvE7adUSd3o_4ITK7Sz4zde0MHYttjfWmD-nFpkV5dct5fUwoWEclFpXPKBLgJKVqYE7oU8x8cu2abxIJNPdZT-dnUy7f84m57z19Cfp_g9ku1NdrQbDwGxPESqo7sUDItAKUbaoszuy3p0gS9XYjBbP8NAwckhqdtDHnblrDSvlLE2ckGL7gdbLluuhCUxgq3bb75_Nj_oz9SgWO4pRvz0QAkZqQIyGTgMaYDnG2ptvVXrfbizykMkUwns1CPrgWvLLFFc_oUGAX-okdFvkYqoKGRxqRqhIS5bX5n8xxj1Z9rgJ0phg' doc:name="set-authorization-token" doc:id="baf40eea-2399-4111-9855-0e9d50afc008" variableName="auth"/>
+		<http:request method="GET" doc:name="request-gtwSapi" doc:id="bc6b5122-1e34-455f-950a-c769e8e8ac25" config-ref="HTTP_Request_configuration" path="${secure::gtwpath}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.auth,
+	"client_secret" : "0de5949e400f44fbB810d5F80a108E86",
+	"client_id" : "713f30ef99034178bc4ca2c2e5b54b43"
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"fromTime" : "2022-02-27T10:00:00Z",
+	"toTime" : "2022-03-01T22:00:00Z"
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="Log:webinar-details-fetched" doc:id="c9fa5b27-3ae2-4385-9f20-93b7a5bb1431" message="Webinar Details Fetched"/>
+		<ee:transform doc:name="get-webinar-ID" doc:id="a8cd398c-0855-48ea-b0e8-d70872929949">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload."_embedded".webinars.*webinarId]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<foreach doc:name="For Each" doc:id="6eb40ea3-8f35-4da9-babd-34a56bd64f8e" >
+			<set-variable value="#[payload]" doc:name="single-webinar-Id" doc:id="3915596f-6d1b-444f-ae8e-d15f3eb9da2c" variableName="webinarKey"/>
+			<try doc:name="Try" doc:id="badd9235-6faf-4ad3-9d1f-e074b64196b3" >
+				<http:request method="GET" doc:name="request-gtw-registrants-api" doc:id="40829f2d-226f-4580-bd38-89965b7d55fa" config-ref="HTTP_Request_configuration1" path="${secure::apipath}">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.auth,
+	"Accept" : "application/json"
+}]]]></http:headers>
+				<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"webinarkey" : payload
+}]]]></http:uri-params>
+		</http:request>
+				<error-handler >
+					<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="24b2a4b2-4ed2-4a1a-abea-bc1559ff93dc" type="ANY">
+						<ee:transform doc:name="error-message" doc:id="403f6c50-d9e6-4dad-8f8a-3d50c608e7ce" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Error fetching Registrants Details"
+}]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+					</on-error-propagate>
+				</error-handler>
+			</try>
+			<logger level="INFO" doc:name="Log:registrants-data-fetched" doc:id="f6fdc08b-5cb0-48fe-8780-016fbf8de0d4" message="Registrants Data Fetched"/>
+			<foreach doc:name="For Each" doc:id="e8ebf420-6c93-4ff2-b7fb-64cfe5bfbfd6">
+				<flow-ref doc:name="flow- adding-data-toSF" doc:id="1ce979c3-8e13-4c9b-bf74-18813615579d" name="schedularSub_Flow" />
+			</foreach>
+		</foreach>
+		<logger level="INFO" doc:name="Log:data-added-successfully" doc:id="10196fb8-9eed-4b46-8100-6485481d58dc" message="Data added Succesfully"/>
+	</flow>
+	<sub-flow name="schedularSub_Flow" doc:id="a596e5d3-f16e-453e-850f-38338160ba76" >
+		<try doc:name="Try" doc:id="896bd046-cff9-4ebe-9802-36caa76e9dee" >
+			<http:request method="GET" doc:name="get-registrant-details" doc:id="c062c2ca-0430-4cab-8973-0bb70135139c" config-ref="HTTP_Request_configuration1" path="${secure::apipath}/{Mykey}">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.auth
+}]]]></http:headers>
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"webinarkey" : vars.webinarKey,
+	"Mykey" : payload.registrantKey
+}]]]></http:uri-params>
+		</http:request>
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name=" Error Propagate" doc:id="a104739f-ff4d-4bb0-b39c-cdea2f5ea860" type="ANY" >
+					<ee:transform doc:name="error-message" doc:id="223a0706-9d0f-4a8b-91e5-ea054e8d4d4d" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Error fetching Registrant Details"
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+				</on-error-propagate>
+			</error-handler>
+		</try>
+		<logger level="INFO" doc:name="Log: detail-fetched" doc:id="6a948b32-e57b-41ad-aa59-ecff4258bc25" message="Single Registrant Details Fetched"/>
+		<ee:transform doc:name="java-to-json" doc:id="34dbe2eb-fa72-404c-90ef-b9686e68a170" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<try doc:name="Try" doc:id="e4d30b90-9e9c-4600-b41b-b886f214c8b7" >
+			<http:request method="POST" doc:name="request-to-salesforce-sapi" doc:id="65791ab5-f563-4b08-a252-8392908db833" config-ref="HTTP_Request_configuration1" url="${secure::sfurl}" sendBodyMode="AUTO" outputMimeType="application/json" />
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="Error Propagate" doc:id="69a04268-8df6-454e-bf82-5a419e4e396f" type="ANY" >
+					<ee:transform doc:name="error-message" doc:id="05c81911-c063-4ed1-8fbd-8b800cadaeb9" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Error Adding To SalesForce"
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+				</on-error-propagate>
+			</error-handler>
+		</try>
+		<logger level="INFO" doc:name="Log: details-added" doc:id="b112b898-9a80-4a37-a401-78a0713024dc" message="Registrant Details Added to SF"/>
+	</sub-flow>
+</mule>

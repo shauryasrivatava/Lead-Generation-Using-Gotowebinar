@@ -1,0 +1,23 @@
+{
+  "headers": {
+    "server": "nginx",
+    "date": "Wed, 02 Mar 2022 09:22:43 GMT",
+    "content-type": "application/json;charset=UTF-8",
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "x-uuid-header": "7173198887878353664",
+    "x-content-type-options": "nosniff",
+    "x-xss-protection": "1; mode=block",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "pragma": "no-cache",
+    "expires": "0",
+    "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+    "x-frame-options": "DENY",
+    "access-control-allow-origin": "*",
+    "access-control-allow-headers": "origin, x-requested-with, authorization, accept, content-type",
+    "access-control-max-age": "3628800",
+    "access-control-allow-methods": "GET, POST, PUT, DELETE"
+  },
+  "reasonPhrase": "",
+  "statusCode": 200
+}

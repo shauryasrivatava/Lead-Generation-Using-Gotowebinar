@@ -1,0 +1,23 @@
+pipeline {
+  agent any
+  stages {
+    stage('Build') {
+      steps {
+           echo "build success"
+           bat "mvn clean package"
+      }
+    }
+    stage('Test') {
+      steps {
+          echo "mvn test starts"
+          bat "mvn test"
+      }
+    }
+     stage('Deploy Development') {
+      steps {
+            echo "deploy success"
+            bat "mvn deploy -DmuleDeploy"
+      }
+    }
+   }
+}

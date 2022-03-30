@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="schedular-suite.xml" />
+	<munit:test name="schedularFlow-test" doc:id="485dcfc5-cf0a-4330-90f8-a286dabcbafd" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock flow--getRegistrants" doc:id="4ff488c6-351f-42c4-b616-0a47708db7e2" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="8882ee39-3e1c-4ce5-b461-af4240eb1f0b" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json --- readUrl('classpath://schedularFlowtest\mock_payload.dwl')]" mediaType="application/json" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://schedularFlowtest\mock_attributes.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="webinarKey" value="#[output application/json --- readUrl('classpath://schedularFlowtest\mock_variable_.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="auth" value="#[readUrl('classpath://schedularFlowtest\mock_variable_1.dwl')]" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="aa1d9571-9f27-4828-b517-eec7c452f7a2" >
+				<munit:payload value="#[readUrl('classpath://schedularFlowtest\set-event_payload.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to schedularFlow" doc:id="e2e55c22-29f6-4aa7-9e93-e30f04503e9a" name="addDataToSF"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="857a1678-98db-4157-aeb2-05a8ecb23e9d" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import schedularFlowtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<flow name="mock-flow-ref" doc:id="0b63309b-988a-48eb-a489-3b74593c3d81" >
+		<try doc:name="Try" doc:id="87ae06b8-a678-4f3f-929f-9def52c258ca" >
+			<munit-tools:retrieve doc:name="Retrieve" doc:id="0bb4d1cc-8828-441d-946f-c81218cd28ef" key="Mock flow- adding-data-toSF"/>
+			<error-handler >
+				<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="a13d5481-ba9a-4402-9b76-553af94b7ddf" type="ANY">
+					<set-payload value="#[1]" doc:name="Set Payload" doc:id="9ad5485c-f333-4c7d-aa38-308e708484d0" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<munit-tools:store doc:name="Store" doc:id="b0cef2a8-bbb0-4de1-99f2-b478629b2808" key="Mock flow- adding-data-toSF">
+			<munit-tools:value ><![CDATA[#[payload + 1]]]></munit-tools:value>
+		</munit-tools:store>
+		<choice doc:name="Choice" doc:id="7029187d-9a8b-46e0-b6d5-5fdccdd1ce12" >
+			<when expression="#[payload == 1]">
+				<munit:set-event doc:name="Set Event" doc:id="a948f7fc-2995-4884-9f95-a193c17f7b17" >
+					<munit:payload value="#[output application/json --- readUrl('classpath://getRegistrantstest\mock_payload1.dwl')]" encoding="UTF-8" mediaType="application/json" />
+					<munit:attributes value="#[readUrl('classpath://getRegistrantstest\mock_attributes1.dwl')]" />
+					<munit:variables >
+						<munit:variable key="webinarKey" value="#[output application/json --- readUrl('classpath://getRegistrantstest\mock_variable_1.dwl')]" encoding="UTF-8" mediaType="application/json" />
+						<munit:variable key="rootMessage" value="#[readUrl('classpath://getRegistrantstest\mock_variable_2.dwl')]" />
+						<munit:variable key="auth" value="#[readUrl('classpath://getRegistrantstest\mock_variable_3.dwl')]" encoding="UTF-8" />
+						<munit:variable key="counter" value="#[readUrl('classpath://getRegistrantstest\mock_variable_4.dwl')]" />
+					</munit:variables>
+				</munit:set-event>
+			</when>
+			<when expression="#[payload == 2]">
+				<munit:set-event doc:name="Set Event" doc:id="4c1a7f3b-8bcf-4113-b968-28eefee35a8c" >
+					<munit:payload value="#[output application/json --- readUrl('classpath://getRegistrantstest\mock_payload2.dwl')]" encoding="UTF-8" mediaType="application/json" />
+					<munit:attributes value="#[readUrl('classpath://getRegistrantstest\mock_attributes2.dwl')]" />
+					<munit:variables >
+						<munit:variable key="webinarKey" value="#[output application/json --- readUrl('classpath://getRegistrantstest\mock_variable_5.dwl')]" encoding="UTF-8" mediaType="application/json" />
+						<munit:variable key="rootMessage" value="#[readUrl('classpath://getRegistrantstest\mock_variable_6.dwl')]" />
+						<munit:variable key="auth" value="#[readUrl('classpath://getRegistrantstest\mock_variable_7.dwl')]" encoding="UTF-8" />
+						<munit:variable key="counter" value="#[readUrl('classpath://getRegistrantstest\mock_variable_8.dwl')]" />
+					</munit:variables>
+				</munit:set-event>
+			</when>
+			<when expression="#[payload == 3]">
+				<munit:set-event doc:name="Set Event" doc:id="1a37c3fb-a219-45a5-af8b-756416ce565e" >
+					<munit:payload value="#[output application/json --- readUrl('classpath://getRegistrantstest\mock_payload3.dwl')]" encoding="UTF-8" mediaType="application/json" />
+					<munit:attributes value="#[readUrl('classpath://getRegistrantstest\mock_attributes3.dwl')]" />
+					<munit:variables >
+						<munit:variable key="webinarKey" value="#[output application/json --- readUrl('classpath://getRegistrantstest\mock_variable_9.dwl')]" encoding="UTF-8" mediaType="application/json" />
+						<munit:variable key="rootMessage" value="#[readUrl('classpath://getRegistrantstest\mock_variable_10.dwl')]" />
+						<munit:variable key="auth" value="#[readUrl('classpath://getRegistrantstest\mock_variable_11.dwl')]" encoding="UTF-8" />
+						<munit:variable key="counter" value="#[readUrl('classpath://getRegistrantstest\mock_variable_12.dwl')]" />
+					</munit:variables>
+				</munit:set-event>
+			</when>
+			<otherwise >
+				<munit-tools:fail doc:name="Fail" doc:id="615cb48d-013b-4916-af6c-6fcb87768028" message="There are no more events to mock"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<munit:test name="getRegistrants-test" doc:id="9fb45764-4bb6-4d7f-8db9-b58fc9ad699a" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Request" doc:id="4f4e42bb-6cda-4223-8e82-91e0129e1a26" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="bc6b5122-1e34-455f-950a-c769e8e8ac25" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json --- readUrl('classpath://getRegistrantstest\mock_payload.dwl')]" mediaType="application/json" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://getRegistrantstest\mock_attributes.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="auth" value="#[readUrl('classpath://getRegistrantstest\mock_variable_.dwl')]" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock flow- adding-data-toSF" doc:id="bf94810c-d642-4983-b412-4ac808c018d2" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="1ce979c3-8e13-4c9b-bf74-18813615579d" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="mock-flow-ref" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock request-gtw-registrants-api" doc:id="b60614ad-dfaf-48bc-8ffc-e41bb0487618" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="40829f2d-226f-4580-bd38-89965b7d55fa" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="mock-http:request" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Set Authorization Token" doc:id="2b582500-0bb5-4362-925d-c48a1382f3ea" processor="set-variable">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="baf40eea-2399-4111-9855-0e9d50afc008" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="auth" value="#[readUrl('classpath://getRegistrantstest\mock_variable_29.dwl')]" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="09ba9c64-6437-4fda-aa62-896fb4d65022" >
+				<munit:payload value="#[readUrl('classpath://getRegistrantstest\set-event_payload.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to getRegistrants" doc:id="70acd943-2820-4ffc-bbda-db53b1a75a16" name="getRegistrants"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="65e19108-5745-433e-9060-2fc18468b5cb" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import getRegistrantstest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<flow name="mock-http:request" doc:id="1d6922b0-1a3f-4a44-a6de-da0e0826a37d" >
+		<try doc:name="Try" doc:id="0bba2e4e-d7e1-400e-a12f-c17549d8d754" >
+			<munit-tools:retrieve doc:name="Retrieve" doc:id="d3b73284-4a80-4d3d-880c-bb11005a0fc5" key="Mock request-gtw-registrants-api"/>
+			<error-handler >
+				<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="caa31a20-6057-470b-865f-f23521b9e9bf" type="ANY">
+					<set-payload value="#[1]" doc:name="Set Payload" doc:id="a8e07014-c06b-4386-a991-f7c0b7564739" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<munit-tools:store doc:name="Store" doc:id="5db357a2-7953-40b0-9a3c-c5a733f2525c" key="Mock request-gtw-registrants-api">
+			<munit-tools:value ><![CDATA[#[payload + 1]]]></munit-tools:value>
+		</munit-tools:store>
+		<choice doc:name="Choice" doc:id="5dd66b8a-b8e8-4922-84af-5e4ba76f2d1d" >
+			<when expression="#[payload == 1]">
+				<munit:set-event doc:name="Set Event" doc:id="26affab7-b081-4a90-b1dd-272c866719bf" >
+					<munit:payload value="#[output application/vnd.citrix.g2wapi-v1.1+json --- readUrl('classpath://getRegistrantstest\mock_payload4.dwl')]" encoding="UTF-8" mediaType="application/vnd.citrix.g2wapi-v1.1+json" />
+					<munit:attributes value="#[readUrl('classpath://getRegistrantstest\mock_attributes4.dwl')]" />
+					<munit:variables >
+						<munit:variable key="webinarKey" value="#[output application/json --- readUrl('classpath://getRegistrantstest\mock_variable_13.dwl')]" encoding="UTF-8" mediaType="application/json" />
+						<munit:variable key="rootMessage" value="#[readUrl('classpath://getRegistrantstest\mock_variable_14.dwl')]" />
+						<munit:variable key="auth" value="#[readUrl('classpath://getRegistrantstest\mock_variable_15.dwl')]" encoding="UTF-8" />
+						<munit:variable key="counter" value="#[readUrl('classpath://getRegistrantstest\mock_variable_16.dwl')]" />
+					</munit:variables>
+				</munit:set-event>
+			</when>
+			<when expression="#[payload == 2]">
+				<munit:set-event doc:name="Set Event" doc:id="4a4455b5-f79d-4d0f-a58f-9cbb56fb6c23" >
+					<munit:payload value="#[output application/vnd.citrix.g2wapi-v1.1+json --- readUrl('classpath://getRegistrantstest\mock_payload5.dwl')]" encoding="UTF-8" mediaType="application/vnd.citrix.g2wapi-v1.1+json" />
+					<munit:attributes value="#[readUrl('classpath://getRegistrantstest\mock_attributes5.dwl')]" />
+					<munit:variables >
+						<munit:variable key="webinarKey" value="#[output application/json --- readUrl('classpath://getRegistrantstest\mock_variable_17.dwl')]" encoding="UTF-8" mediaType="application/json" />
+						<munit:variable key="rootMessage" value="#[readUrl('classpath://getRegistrantstest\mock_variable_18.dwl')]" />
+						<munit:variable key="auth" value="#[readUrl('classpath://getRegistrantstest\mock_variable_19.dwl')]" encoding="UTF-8" />
+						<munit:variable key="counter" value="#[readUrl('classpath://getRegistrantstest\mock_variable_20.dwl')]" />
+					</munit:variables>
+				</munit:set-event>
+			</when>
+			<when expression="#[payload == 3]">
+				<munit:set-event doc:name="Set Event" doc:id="adc46b09-76cc-4037-9934-60895e9bb92e" >
+					<munit:payload value="#[output application/vnd.citrix.g2wapi-v1.1+json --- readUrl('classpath://getRegistrantstest\mock_payload6.dwl')]" encoding="UTF-8" mediaType="application/vnd.citrix.g2wapi-v1.1+json" />
+					<munit:attributes value="#[readUrl('classpath://getRegistrantstest\mock_attributes6.dwl')]" />
+					<munit:variables >
+						<munit:variable key="webinarKey" value="#[output application/json --- readUrl('classpath://getRegistrantstest\mock_variable_21.dwl')]" encoding="UTF-8" mediaType="application/json" />
+						<munit:variable key="rootMessage" value="#[readUrl('classpath://getRegistrantstest\mock_variable_22.dwl')]" />
+						<munit:variable key="auth" value="#[readUrl('classpath://getRegistrantstest\mock_variable_23.dwl')]" encoding="UTF-8" />
+						<munit:variable key="counter" value="#[readUrl('classpath://getRegistrantstest\mock_variable_24.dwl')]" />
+					</munit:variables>
+				</munit:set-event>
+			</when>
+			<when expression="#[payload == 4]">
+				<munit:set-event doc:name="Set Event" doc:id="3be23bf8-67e1-4bd5-b5ea-a32c4167f38f" >
+					<munit:payload value="#[output application/vnd.citrix.g2wapi-v1.1+json --- readUrl('classpath://getRegistrantstest\mock_payload7.dwl')]" encoding="UTF-8" mediaType="application/vnd.citrix.g2wapi-v1.1+json" />
+					<munit:attributes value="#[readUrl('classpath://getRegistrantstest\mock_attributes7.dwl')]" />
+					<munit:variables >
+						<munit:variable key="webinarKey" value="#[output application/json --- readUrl('classpath://getRegistrantstest\mock_variable_25.dwl')]" encoding="UTF-8" mediaType="application/json" />
+						<munit:variable key="rootMessage" value="#[readUrl('classpath://getRegistrantstest\mock_variable_26.dwl')]" />
+						<munit:variable key="auth" value="#[readUrl('classpath://getRegistrantstest\mock_variable_27.dwl')]" encoding="UTF-8" />
+						<munit:variable key="counter" value="#[readUrl('classpath://getRegistrantstest\mock_variable_28.dwl')]" />
+					</munit:variables>
+				</munit:set-event>
+			</when>
+			<otherwise >
+				<munit-tools:fail doc:name="Fail" doc:id="b3c1536f-7060-4f1e-b410-ad1e68ac5dfe" message="There are no more events to mock"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<munit:test name="schedularSub_Flow-test" doc:id="6d35b82e-e8f3-42a7-8efa-2a95e159cb0b" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock request-to-salesforce-sapi" doc:id="648a6a44-c35c-49ce-a634-cc1a175ec6cb" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="65791ab5-f563-4b08-a252-8392908db833" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json --- readUrl('classpath://schedularSubFlowtest\mock_payload.dwl')]" mediaType="application/json" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://schedularSubFlowtest\mock_attributes.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="webinarKey" value="#[output application/json --- readUrl('classpath://schedularSubFlowtest\mock_variable_.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="rootMessage" value="#[readUrl('classpath://schedularSubFlowtest\mock_variable_1.dwl')]" />
+						<munit-tools:variable key="auth" value="#[readUrl('classpath://schedularSubFlowtest\mock_variable_2.dwl')]" encoding="UTF-8" />
+						<munit-tools:variable key="counter" value="#[readUrl('classpath://schedularSubFlowtest\mock_variable_3.dwl')]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock get-registrant-details" doc:id="715361df-6fd2-4ebf-9150-6cbd2362164a" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="c062c2ca-0430-4cab-8973-0bb70135139c" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/vnd.citrix.g2wapi-v1.1+json --- readUrl('classpath://schedularSubFlowtest\mock_payload1.dwl')]" mediaType="application/vnd.citrix.g2wapi-v1.1+json" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://schedularSubFlowtest\mock_attributes1.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="webinarKey" value="#[output application/json --- readUrl('classpath://schedularSubFlowtest\mock_variable_4.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="rootMessage" value="#[readUrl('classpath://schedularSubFlowtest\mock_variable_5.dwl')]" />
+						<munit-tools:variable key="auth" value="#[readUrl('classpath://schedularSubFlowtest\mock_variable_6.dwl')]" encoding="UTF-8" />
+						<munit-tools:variable key="counter" value="#[readUrl('classpath://schedularSubFlowtest\mock_variable_7.dwl')]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="e0abeb29-f708-486e-bdd5-2bb70e85b37e" >
+				<munit:payload value="#[output application/vnd.citrix.g2wapi-v1.1+json --- readUrl('classpath://schedularSubFlowtest\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/vnd.citrix.g2wapi-v1.1+json" />
+				<munit:variables >
+					<munit:variable key="webinarKey" value="#[output application/json --- readUrl('classpath://schedularSubFlowtest\set-event_variable_.dwl')]" encoding="UTF-8" mediaType="application/json" />
+					<munit:variable key="rootMessage" value="#[readUrl('classpath://schedularSubFlowtest\set-event_variable_1.dwl')]" />
+					<munit:variable key="auth" value="#[readUrl('classpath://schedularSubFlowtest\set-event_variable_2.dwl')]" encoding="UTF-8" />
+					<munit:variable key="counter" value="#[readUrl('classpath://schedularSubFlowtest\set-event_variable_3.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to schedularSub_Flow" doc:id="1d78583f-aa7e-4772-bddf-fc637349af68" name="schedularSub_Flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="0bd1ee43-677a-4196-b275-3957401c1358" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import schedularSubFlowtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="addDataToSF-test" doc:id="6e3225cc-5626-4390-9db9-82d6a39dff80" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock flow--getRegistrants" doc:id="5ec29f59-2ef6-4d81-a061-b97dd45a4fcd" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="8882ee39-3e1c-4ce5-b461-af4240eb1f0b" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json --- readUrl('classpath://addDataToSFtest\mock_payload.dwl')]" mediaType="application/json" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://addDataToSFtest\mock_attributes.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="webinarKey" value="#[output application/json --- readUrl('classpath://addDataToSFtest\mock_variable_.dwl')]" mediaType="application/json" encoding="UTF-8" />
+						<munit-tools:variable key="auth" value="#[readUrl('classpath://addDataToSFtest\mock_variable_1.dwl')]" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="4edda1f4-34c6-4854-891e-7a0666694e6f" >
+				<munit:payload value="#[readUrl('classpath://addDataToSFtest\set-event_payload.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to addDataToSF" doc:id="c041963d-73de-4949-9aad-f6304da9f6a8" name="addDataToSF"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="07546621-8b57-4aca-aea0-952131489702" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import addDataToSFtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>
