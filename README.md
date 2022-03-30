@@ -1,6 +1,5 @@
-| Plugin | README |
-| ------ | ------ |
 | Title: | Lead Generation Using Gotowebinar|
+| ------ | ------ |
 |Description: | Company wants to expose their Salesforce systems to its partner to add, update contact details|
 | Preconditions: | This would be a Scheduler Job which Runs once in a Day and generate leads for people who have attended the Webinar |
 |Postconditions: |The people who have attended webinar should be added as new Leads to salesforce (Lead object)|
